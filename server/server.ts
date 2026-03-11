@@ -60,34 +60,29 @@ function generateId(): string {
 /**
  * GET /api/users - List all users
  */
-app.get('/api/users', (req: Request, res: Response<ApiResponse<User[]>>): void => {
+app.get('/api/users', (req: Request, res: Response): void => {
   console.log('[API] GET /api/users');
   res.json({
-    success: true,
-    data: users,
-    count: users.length,
+    users: users,
+    total: users.length,
   });
 });
 
 /**
  * GET /api/users/:id - Get single user
  */
-app.get('/api/users/:id', (req: Request, res: Response<ApiResponse<User>>): void => {
+app.get('/api/users/:id', (req: Request, res: Response): void => {
   console.log(`[API] GET /api/users/${req.params.id}`);
   const user = users.find(u => u.id === req.params.id);
 
   if (!user) {
     res.status(404).json({
-      success: false,
       error: `User with ID ${req.params.id} not found`,
     });
     return;
   }
 
-  res.json({
-    success: true,
-    data: user,
-  });
+  res.json(user);
 });
 
 /**
@@ -98,14 +93,13 @@ interface CreateUserRequest {
   email?: string;
 }
 
-app.post('/api/users', (req: Request<unknown, unknown, CreateUserRequest>, res: Response<ApiResponse<User>>): void => {
+app.post('/api/users', (req: Request<unknown, unknown, CreateUserRequest>, res: Response): void => {
   console.log('[API] POST /api/users', req.body);
   const { name, email } = req.body;
 
   // Validation
   if (!name || typeof name !== 'string' || name.trim().length === 0) {
     res.status(400).json({
-      success: false,
       error: 'Name is required and must be a non-empty string',
     });
     return;
@@ -113,7 +107,6 @@ app.post('/api/users', (req: Request<unknown, unknown, CreateUserRequest>, res: 
 
   if (!email || typeof email !== 'string' || !email.includes('@')) {
     res.status(400).json({
-      success: false,
       error: 'Valid email is required',
     });
     return;
@@ -122,7 +115,6 @@ app.post('/api/users', (req: Request<unknown, unknown, CreateUserRequest>, res: 
   // Check if email already exists
   if (users.some(u => u.email === email)) {
     res.status(400).json({
-      success: false,
       error: `User with email ${email} already exists`,
     });
     return;
@@ -138,31 +130,26 @@ app.post('/api/users', (req: Request<unknown, unknown, CreateUserRequest>, res: 
   users.push(newUser);
   console.log(`[API] User created with ID ${newUser.id}`);
 
-  res.status(201).json({
-    success: true,
-    data: newUser,
-    message: 'User created successfully',
-  });
+  res.status(201).json(newUser);
 });
 
 /**
- * PUT /api/users/:id - Update user
+ * PATCH /api/users/:id - Update user
  */
 interface UpdateUserRequest {
   name?: string;
   email?: string;
 }
 
-app.put(
+app.patch(
   '/api/users/:id',
-  (req: Request<{ id: string }, unknown, UpdateUserRequest>, res: Response<ApiResponse<User>>): void => {
-    console.log(`[API] PUT /api/users/${req.params.id}`, req.body);
+  (req: Request<{ id: string }, unknown, UpdateUserRequest>, res: Response): void => {
+    console.log(`[API] PATCH /api/users/${req.params.id}`, req.body);
     const { name, email } = req.body;
     const user = users.find(u => u.id === req.params.id);
 
     if (!user) {
       res.status(404).json({
-        success: false,
         error: `User with ID ${req.params.id} not found`,
       });
       return;
@@ -172,7 +159,6 @@ app.put(
     if (name !== undefined) {
       if (typeof name !== 'string' || name.trim().length === 0) {
         res.status(400).json({
-          success: false,
           error: 'Name must be a non-empty string',
         });
         return;
@@ -183,7 +169,6 @@ app.put(
     if (email !== undefined) {
       if (typeof email !== 'string' || !email.includes('@')) {
         res.status(400).json({
-          success: false,
           error: 'Valid email is required',
         });
         return;
@@ -192,7 +177,6 @@ app.put(
       // Check if email is taken by another user
       if (users.some(u => u.email === email && u.id !== req.params.id)) {
         res.status(400).json({
-          success: false,
           error: `User with email ${email} already exists`,
         });
         return;
@@ -203,11 +187,7 @@ app.put(
 
     console.log(`[API] User ${req.params.id} updated`);
 
-    res.json({
-      success: true,
-      data: user,
-      message: 'User updated successfully',
-    });
+    res.json(user);
   },
 );
 
@@ -216,13 +196,12 @@ app.put(
  */
 app.delete(
   '/api/users/:id',
-  (req: Request<{ id: string }>, res: Response<ApiResponse<User>>): void => {
+  (req: Request<{ id: string }>, res: Response): void => {
     console.log(`[API] DELETE /api/users/${req.params.id}`);
     const index = users.findIndex(u => u.id === req.params.id);
 
     if (index === -1) {
       res.status(404).json({
-        success: false,
         error: `User with ID ${req.params.id} not found`,
       });
       return;
@@ -231,11 +210,7 @@ app.delete(
     const deletedUser = users.splice(index, 1)[0];
     console.log(`[API] User ${req.params.id} deleted`);
 
-    res.json({
-      success: true,
-      data: deletedUser,
-      message: 'User deleted successfully',
-    });
+    res.json(deletedUser);
   },
 );
 
