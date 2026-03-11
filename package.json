@@ -1,0 +1,77 @@
+{
+  "name": "react-app-template",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css}\"",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "preview": "vite preview",
+    "commit": "cz commit",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "src/**/*.json": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.28.0",
+    "axios": "^1.6.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.21.0",
+    "tailwindcss": "^3.3.6",
+    "zod": "^3.22.4"
+  },
+  "optionalDependencies": {
+    "@grafana/faro-core": "^1.4.1",
+    "@grafana/faro-react": "^1.4.1",
+    "@grafana/faro-web-tracing": "^1.4.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
+    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/react": "^14.1.2",
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "@vitest/ui": "^1.1.0",
+    "autoprefixer": "^10.4.16",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.3",
+    "postcss": "^8.4.32",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.7",
+    "vitest": "^1.1.0"
+  }
+}
