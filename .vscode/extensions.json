@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "dsznajder.es7-react-js-snippets",
+    "ThemeKind.darkplus-material",
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": [
+    "ms-python.python",
+    "ms-python.django"
+  ]
+}
