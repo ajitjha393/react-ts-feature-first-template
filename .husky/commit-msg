@@ -1,0 +1,23 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Validate commit message format with commitlint
+pnpm commitlint --edit "$1"
+
+# Check commit size for AI-generated commits
+commit_size=$(wc -c < "$1")
+max_size=$((300 * 1024))  # 300KB
+
+if [ "$commit_size" -gt "$max_size" ]; then
+  echo ""
+  echo "❌ COMMIT REJECTED: Commit message with diff is too large ($(($commit_size / 1024))KB > 300KB)"
+  echo ""
+  echo "🤖 AI commits must be under 300KB (approx 300 lines of code change)"
+  echo ""
+  echo "💡 Tips to fix:"
+  echo "   - Break changes into multiple smaller commits"
+  echo "   - Use 'git add <file>' to stage specific files instead of 'git add .'"
+  echo "   - Avoid committing auto-generated files (node_modules, dist, coverage, etc.)"
+  echo ""
+  exit 1
+fi
