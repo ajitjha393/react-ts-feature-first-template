@@ -10,7 +10,6 @@ interface NavLink {
 const navLinks: NavLink[] = [
   { label: 'Home', href: '/', icon: '🏠' },
   { label: 'Users', href: '/users', icon: '👥' },
-  { label: 'Monitoring', href: '/monitoring', icon: '📊' },
 ];
 
 export default function Layout(): React.ReactElement {
@@ -34,9 +33,7 @@ export default function Layout(): React.ReactElement {
                     key={link.href}
                     to={link.href}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                      isActive ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
                     <span>{link.icon}</span>

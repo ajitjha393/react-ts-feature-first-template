@@ -26,8 +26,8 @@ export default function HomePage(): React.ReactElement {
       <div>
         <h1 className="mb-4 text-4xl font-bold text-gray-900">Welcome</h1>
         <p className="text-lg text-gray-600">
-          This is a production-ready React template with feature-first architecture, proper logging, and
-          best practices.
+          This is a production-ready React template with feature-first architecture, proper logging,
+          and best practices.
         </p>
       </div>
 
@@ -53,12 +53,12 @@ export default function HomePage(): React.ReactElement {
         </div>
 
         <div className="card">
-          <h2 className="mb-2 text-xl font-bold">✓ Logging & Monitoring</h2>
+          <h2 className="mb-2 text-xl font-bold">✓ Observability</h2>
           <ul className="space-y-2 text-sm text-gray-600">
             <li>Grafana Faro integration</li>
-            <li>Real-time log viewer</li>
-            <li>Automatic error tracking</li>
-            <li>Performance monitoring</li>
+            <li>Distributed tracing</li>
+            <li>Error tracking with stack traces</li>
+            <li>Real User Monitoring (Web Vitals)</li>
           </ul>
         </div>
 
@@ -74,26 +74,12 @@ export default function HomePage(): React.ReactElement {
       </div>
 
       {/* Quick Links */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Link
-          to="/users"
-          className="card hover:shadow-lg transition-shadow cursor-pointer"
-        >
+      <div className="grid gap-4 md:grid-cols-2">
+        <Link to="/users" className="card hover:shadow-lg transition-shadow cursor-pointer">
           <div className="text-3xl mb-2">👥</div>
           <h3 className="font-bold">Users</h3>
           <p className="text-sm text-gray-600 mt-1">
             Complete CRUD example with proper error handling and logging
-          </p>
-        </Link>
-
-        <Link
-          to="/monitoring"
-          className="card hover:shadow-lg transition-shadow cursor-pointer"
-        >
-          <div className="text-3xl mb-2">📊</div>
-          <h3 className="font-bold">Monitoring</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Real-time log viewer - see all application logs here
           </p>
         </Link>
 
@@ -106,15 +92,12 @@ export default function HomePage(): React.ReactElement {
         </div>
       </div>
 
-      {/* Logging Demo */}
+      {/* Grafana Faro Logging */}
       <div className="rounded-lg bg-indigo-50 p-6">
-        <h2 className="mb-2 text-lg font-bold text-indigo-900">Logging Demo</h2>
+        <h2 className="mb-2 text-lg font-bold text-indigo-900">Grafana Faro Logging</h2>
         <p className="text-indigo-800 text-sm mb-4">
-          Click the button below to generate a log entry. View it in real-time on the{' '}
-          <Link to="/monitoring" className="underline font-semibold hover:text-indigo-900">
-            Monitoring page
-          </Link>
-          .
+          All application logs and events are automatically sent to Grafana Faro for monitoring.
+          Configure VITE_FARO_URL in .env.local to see logs in your Grafana instance.
         </p>
         <button onClick={handleTestLogging} className="btn-primary">
           Generate Test Log
@@ -126,15 +109,12 @@ export default function HomePage(): React.ReactElement {
         <h2 className="mb-4 text-lg font-bold text-blue-900">Quick Start</h2>
         <ol className="list-inside list-decimal space-y-2 text-blue-800 text-sm">
           <li>
-            <strong>Explore features:</strong> Check <code className="rounded bg-white px-2 py-1">src/features/</code> for
-            feature structure
+            <strong>Explore features:</strong> Check{' '}
+            <code className="rounded bg-white px-2 py-1">src/features/</code> for feature structure
           </li>
           <li>
-            <strong>View logs:</strong> Go to{' '}
-            <Link to="/monitoring" className="underline font-semibold">
-              Monitoring page
-            </Link>
-            {' '}to see all logs
+            <strong>View logs:</strong> Configure VITE_FARO_URL in .env.local and view logs in
+            Grafana
           </li>
           <li>
             <strong>Create features:</strong> Use QUICK_START.md as a guide
@@ -160,7 +140,7 @@ export default function HomePage(): React.ReactElement {
             <strong>ARCHITECTURE.md</strong> - Design patterns and architectural decisions
           </p>
           <p>
-            <strong>BEST_PRACTICES.md</strong> - Code guidelines and do's/don'ts
+            <strong>BEST_PRACTICES.md</strong> - Code guidelines and do&apos;s/don&apos;ts
           </p>
           <p>
             <strong>QUICK_START.md</strong> - Step-by-step guide to create new features
