@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/prefer-promise-reject-errors */
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import { logger } from '@/lib/logging/logger';
 import { Result } from '@/lib/result';
@@ -17,10 +18,20 @@ export class ApiClient {
   }
 
   private setupInterceptors(): void {
-    // Request interceptor
+    // Request interceptor - for distributed tracing
     this.client.interceptors.request.use(
       (config) => {
-        logger.debug('API Request', { method: config.method, url: config.url });
+        const startTime = performance.now();
+
+        // Store request start time for latency tracking
+        (config as any)._startTime = startTime;
+
+        logger.debug('API Request', {
+          method: config.method?.toUpperCase(),
+          url: config.url,
+          timestamp: new Date().toISOString(),
+        });
+
         return config;
       },
       (error) => {
@@ -29,18 +40,52 @@ export class ApiClient {
       },
     );
 
-    // Response interceptor
+    // Response interceptor - track performance and errors
     this.client.interceptors.response.use(
       (response) => {
-        logger.debug('API Response', { status: response.status, url: response.config.url });
+        const duration = performance.now() - ((response.config as any)._startTime || 0);
+
+        logger.debug('API Response', {
+          method: response.config.method?.toUpperCase(),
+          url: response.config.url,
+          status: response.status,
+          statusText: response.statusText,
+          durationMs: Math.round(duration),
+          timestamp: new Date().toISOString(),
+        });
+
+        // Track event in Faro for analytics
+        logger.trackEvent('api_request_success', {
+          method: response.config.method,
+          status: response.status,
+          url: response.config.url,
+          durationMs: duration,
+        });
+
         return response;
       },
       (error: AxiosError) => {
+        const duration = performance.now() - ((error.config as any)._startTime || 0);
+
         logger.error('API Error', {
+          method: error.config?.method?.toUpperCase(),
+          url: error.config?.url,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          message: error.message,
+          durationMs: Math.round(duration),
+          timestamp: new Date().toISOString(),
+        });
+
+        // Track error event in Faro for monitoring
+        logger.trackEvent('api_request_error', {
+          method: error.config?.method,
           status: error.response?.status,
           url: error.config?.url,
-          message: error.message,
+          durationMs: duration,
+          errorMessage: error.message,
         });
+
         return Promise.reject(error);
       },
     );
