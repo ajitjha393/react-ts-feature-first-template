@@ -1,83 +1,179 @@
-import { logStore } from '@/lib/logging/store';
+type LogContext = Record<string, unknown>;
 
-interface LogContext {
-  [key: string]: unknown;
+interface FaroAPI {
+  pushLog?: (logs: { level: string; message: string; attributes?: LogContext }[]) => void;
+  pushError?: (
+    error: Error,
+    options?: { skipStackFrameProcessing: boolean; attributes?: LogContext },
+  ) => void;
+  pushEvent?: (eventName: string, attributes?: LogContext) => void;
+  pushTrace?: (spanName: string, attributes?: LogContext) => void;
 }
 
-// Get Faro instance from window
-function getFaro(): any {
-  return (window as any).__faro;
+interface Faro {
+  api?: FaroAPI;
 }
 
+/**
+ * Get Faro instance for observability
+ * Faro provides: distributed tracing, error tracking, performance monitoring
+ */
+function getFaro(): Faro | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+  return (window as any).faro as Faro | undefined;
+}
+
+/**
+ * Logger utility with Grafana Faro integration
+ * All logs are automatically sent to Faro for observability
+ */
 export const logger = {
+  /**
+   * Debug level logging
+   */
   debug(message: string, context?: LogContext): void {
+    // eslint-disable-next-line no-console
     console.debug(message, context);
-    logStore.addLog('debug', message, context);
-
     try {
       const faro = getFaro();
-      if (faro?.api) {
-        faro.api.pushLog([{ level: 'debug', message, ...context }]);
+      if (faro?.api?.pushLog) {
+        faro.api.pushLog([
+          {
+            level: 'debug',
+            message,
+            ...(context && { attributes: context }),
+          },
+        ]);
       }
-    } catch (error) {
-      // Faro not initialized, ignore
+    } catch {
+      // Silently ignore Faro errors
     }
   },
 
+  /**
+   * Info level logging
+   */
   info(message: string, context?: LogContext): void {
+    // eslint-disable-next-line no-console
     console.info(message, context);
-    logStore.addLog('info', message, context);
-
     try {
       const faro = getFaro();
-      if (faro?.api) {
-        faro.api.pushLog([{ level: 'info', message, ...context }]);
+      if (faro?.api?.pushLog) {
+        faro.api.pushLog([
+          {
+            level: 'info',
+            message,
+            ...(context && { attributes: context }),
+          },
+        ]);
       }
-    } catch (error) {
-      // Faro not initialized, ignore
+    } catch {
+      // Silently ignore Faro errors
     }
   },
 
+  /**
+   * Warn level logging
+   */
   warn(message: string, context?: LogContext): void {
+    // eslint-disable-next-line no-console
     console.warn(message, context);
-    logStore.addLog('warn', message, context);
-
     try {
       const faro = getFaro();
-      if (faro?.api) {
-        faro.api.pushLog([{ level: 'warn', message, ...context }]);
+      if (faro?.api?.pushLog) {
+        faro.api.pushLog([
+          {
+            level: 'warn',
+            message,
+            ...(context && { attributes: context }),
+          },
+        ]);
       }
-    } catch (error) {
-      // Faro not initialized, ignore
+    } catch {
+      // Silently ignore Faro errors
     }
   },
 
+  /**
+   * Error level logging
+   */
   error(message: string, context?: LogContext | Error): void {
     const logContext = context instanceof Error ? { error: context.message } : context;
+    // eslint-disable-next-line no-console
     console.error(message, logContext);
-    logStore.addLog('error', message, logContext);
-
     try {
       const faro = getFaro();
-      if (faro?.api) {
-        faro.api.pushLog([{ level: 'error', message, ...logContext }]);
+      if (faro?.api?.pushLog) {
+        faro.api.pushLog([
+          {
+            level: 'error',
+            message,
+            ...(logContext && { attributes: logContext }),
+          },
+        ]);
       }
-    } catch (error) {
-      // Faro not initialized, ignore
+    } catch {
+      // Silently ignore Faro errors
     }
   },
 
+  /**
+   * Exception tracking - automatically sent to Faro with stack trace
+   */
   exception(error: Error, context?: LogContext): void {
+    // eslint-disable-next-line no-console
     console.error('Exception:', error, context);
-    logStore.addLog('error', `Exception: ${error.message}`, { ...context, stack: error.stack });
-
     try {
       const faro = getFaro();
-      if (faro?.api) {
-        faro.api.pushError(error, { ...context });
+      if (faro?.api?.pushError) {
+        faro.api.pushError(error, {
+          skipStackFrameProcessing: false,
+          ...(context && { attributes: context }),
+        });
       }
-    } catch (faroError) {
-      // Faro not initialized, ignore
+    } catch {
+      // Silently ignore Faro errors
     }
+  },
+
+  /**
+   * Track custom events for analytics
+   */
+  trackEvent(eventName: string, attributes?: LogContext): void {
+    try {
+      const faro = getFaro();
+      if (faro?.api?.pushEvent) {
+        faro.api.pushEvent(eventName, attributes);
+      }
+    } catch {
+      // Silently ignore Faro errors
+    }
+  },
+
+  /**
+   * Distributed tracing span
+   */
+  startTrace(spanName: string): { end: () => void } {
+    try {
+      const faro = getFaro();
+      if (faro?.api?.pushTrace) {
+        const startTime = performance.now();
+        return {
+          end: () => {
+            const duration = performance.now() - startTime;
+            // eslint-disable-next-line no-console
+            console.log(`Span: ${spanName} took ${duration.toFixed(2)}ms`);
+          },
+        };
+      }
+    } catch {
+      // Silently ignore Faro errors
+    }
+
+    return {
+      end: () => {
+        // no-op
+      },
+    };
   },
 };

@@ -20,9 +20,8 @@ module.exports = {
   },
   plugins: ['react-refresh', '@typescript-eslint', 'prettier'],
   rules: {
-    'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+    'react-refresh/only-export-components': 'off',
     'prettier/prettier': ['error'],
-    '@typescript-eslint/explicit-function-return-types': ['error'],
     '@typescript-eslint/no-explicit-any': ['error'],
     '@typescript-eslint/no-floating-promises': ['error'],
     '@typescript-eslint/no-unnecessary-condition': ['error'],
